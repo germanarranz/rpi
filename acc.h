@@ -32,7 +32,7 @@ int esPotencia2 (int num);
 void power_acc(int on);
 void init_I2C_acc();
 void readAccel(float accel_scale);
-void readGyro(data_acc arg, float gyro_scale);
+void readGyro(float gyro_scale);
 float readTemp();
 void conf_accel(int accel_range);
 void conf_gyro(int gyro_range);

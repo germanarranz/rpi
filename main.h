@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 
+
+void uso(char *argv[], int argc);
 extern pthread_mutex_t lock;
 extern int bucle;
 

@@ -30,7 +30,7 @@ void* acc(void* arg) {
         pthread_mutex_lock(&lock);
         readAccel(accel_scale);
         acc_data.temp = readTemp();
-        readGyro(acc_data, gyro_scale);
+        readGyro(gyro_scale);
         pthread_mutex_unlock(&lock);
         usleep(sleep_time);
     }
@@ -107,7 +107,7 @@ float readTemp(){
 	return temp;
 }
 
-void readGyro(data_acc arg, float gyro_scale){
+void readGyro(float gyro_scale){
 	char read_bytes[MAX_READ];  	//Buffer donde almacenaremos los bits de lectura
 	char write_bytes[MAX_WRITE];  	//Buffer para los bits de escritura.
 
@@ -119,9 +119,9 @@ void readGyro(data_acc arg, float gyro_scale){
 	int16_t y_gyro = (read_bytes[2] << 8) | read_bytes[3]; //Concatenar
 	int16_t z_gyro = (read_bytes[4] << 8) | read_bytes[5]; //Concatenar
 
-	arg.gyro_x = x_gyro / gyro_scale; //Sensibilidad pasada como parametro
-	arg.gyro_y = y_gyro / gyro_scale; //Sensibilidad pasada como parametro
-	arg.gyro_z = z_gyro / gyro_scale; //Sensibilidad pasada como parametro
+	acc_data.gyro_x = x_gyro / gyro_scale; //Sensibilidad pasada como parametro
+	acc_data.gyro_y = y_gyro / gyro_scale; //Sensibilidad pasada como parametro
+	acc_data.gyro_z = z_gyro / gyro_scale; //Sensibilidad pasada como parametro
 }
 
 void conf_accel(int accel_range) {

@@ -123,7 +123,7 @@ void conf_rgbc(int rgbc_cycles, int rgbc_gain){
 		break;
 		case 60: write_bytes[1] = 0x03;
 		break;
-		default: fprintf(stderr, "Ganancia no soportada usando 1 por defecto");
+		default: //fprintf(stderr, "Ganancia no soportada usando 1 por defecto");
 	}
 	write(fd_color, write_bytes, 2);
 }
