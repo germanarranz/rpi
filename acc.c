@@ -11,8 +11,6 @@ int fd_acc;
 
 void* acc(void* arg) {
     char **arguments = (char **)arg;
-
-    int argc = *((int *)arguments[0]);
     char **argv = (char **)arguments[1];
 
     int sleep_time = atoi(argv[1]) * 1000;
@@ -34,13 +32,8 @@ void* acc(void* arg) {
         pthread_mutex_unlock(&lock);
         usleep(sleep_time);
     }
-
-    pthread_exit(NULL);
-}
-
-void terminar_acc(int cmd) {
-    term_acc = 0;
     close(fd_acc);
+    pthread_exit(NULL);
 }
 
 void power_acc(int on) {

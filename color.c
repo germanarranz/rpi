@@ -11,31 +11,26 @@ int fd_color = 0;
 
 void* color(void* arg){
 
-	int sleep_time = 1000000;
-	int rgbc_cycles = 10;
-	int rgbc_gain = 1;
-	float rgbc_scale = 1.0;
+    char **arguments = (char **)arg;
+    char **argv = (char **)arguments[1];
 
+    pthread_mutex_lock(&lock);
 	init_I2C_color();
 	power_color(1);
-	conf_rgbc(rgbc_cycles, rgbc_gain);
+	conf_rgbc(atoi(argv[4]), atoi(argv[5]));
+	pthread_mutex_unlock(&lock);
 
 	while(term_color && bucle){
 		pthread_mutex_lock(&lock);
 		readRGBC();
 		pthread_mutex_unlock(&lock);
-		usleep(sleep_time);
+		usleep(atoi(argv[1]) * 1000);
 	}
+	close(fd_color);
 	pthread_exit(NULL);
 
 
 }
-
-void terminar_color(int signal){
-	term_color = 0;
-	close(fd_color);
-}
-
 
 void init_I2C_color(){
 	char i2cFile[15]; //Donde se almacenara el nombre del dispositivo
@@ -114,7 +109,7 @@ void conf_rgbc(int rgbc_cycles, int rgbc_gain){
 	//Configuramos la ganancia
 	write_bytes[0] = COMMAND | GAIN_REG;
 	write_bytes[1] = 0x00;
-	switch(rgbc_cycles){
+	switch(rgbc_gain){
 		case 1: write_bytes[1] = 0x00;
 		break;
 		case 4: write_bytes[1] = 0x01;
@@ -123,7 +118,7 @@ void conf_rgbc(int rgbc_cycles, int rgbc_gain){
 		break;
 		case 60: write_bytes[1] = 0x03;
 		break;
-		default: //fprintf(stderr, "Ganancia no soportada usando 1 por defecto");
+		default: fprintf(stderr, "Ganancia no soportada usando 1 por defecto");
 	}
 	write(fd_color, write_bytes, 2);
 }

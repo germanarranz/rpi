@@ -27,7 +27,6 @@ typedef struct{
 	float acc_x, acc_y, acc_z, gyro_x, gyro_y, gyro_z, temp;
 }data_acc;
 
-void terminar_acc(int cmd);
 int esPotencia2 (int num);
 void power_acc(int on);
 void init_I2C_acc();

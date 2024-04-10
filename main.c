@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     term_acc = 1;
     term_color = 1;
 
-    if(pthread_create(&th_color, NULL, color, NULL) != 0) {
+    if(pthread_create(&th_color, NULL, color, arguments) != 0) {
         perror("Error creating color thread");
         return 1;
     }
@@ -43,23 +43,25 @@ int main(int argc, char *argv[]) {
 
     while (bucle) {
 
-    	printf("\033[H");
-
-    	    // Mostrar el menú
-
+    	signal(SIGINT, close_all);
+    	system("clear");
         //pthread_mutex_lock(&lock);
         printf("=========== Datos de la Aplicación ===========\n");
-        printf("   Aceleración (x, y, z): %.2f, %.2f, %.2f\n", acc_data.acc_x, acc_data.acc_y, acc_data.acc_z);
-        printf("   Giroscopio (x, y, z): %.2f, %.2f, %.2f\n", acc_data.gyro_x, acc_data.gyro_y, acc_data.gyro_z);
-        printf("   Temperatura: %.2f\n", acc_data.temp);
-        printf("   Color RGB: (%d, %d, %d)\n", color_data.red, color_data.green, color_data.blue);
+        printf("   Aceleración (x, y, z): %.2f g, %.2f g, %.2f g SENSIBILIDAD: %d g\n", acc_data.acc_x, acc_data.acc_y, acc_data.acc_z, atoi(argv[2]));
+        printf("   Giroscopio (x, y, z): %.2fº, %.2fº, %.2fº     SENSIBILIDAD: %d º\n", acc_data.gyro_x, acc_data.gyro_y, acc_data.gyro_z, atoi(argv[3]));
+        printf("   Temperatura: %.2f ºC\n", acc_data.temp);
+        printf("   Color RGB: (%d R, %d G, %d B)\n", color_data.red, color_data.green, color_data.blue);
         printf("==============================================\n");
+        fflush(stdout);
+        sleep(1);
         //pthread_mutex_unlock(&lock);
 
     }
 
     pthread_join(th_acc, NULL);
     pthread_join(th_color, NULL);
+
+    printf("Adios");
 
     return 0;
 }
@@ -69,8 +71,8 @@ void close_all(int signal) {
     term_acc = 0;
     term_color = 0;
     pthread_mutex_destroy(&lock);
-    exit(0);
     printf("\n");
+
 }
 
 void uso(char *argv[], int argc){

@@ -30,7 +30,6 @@ void power_color(int on);
 void readRGBC();
 void conf_rgbc(int rgbc_cycles, int rgbc_gain);
 void* color(void* arg);
-void terminar_color(int signal);
 
 typedef struct{
 	int red, green, blue, clearence;
