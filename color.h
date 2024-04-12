@@ -2,7 +2,7 @@
  * color.h
  *
  *  Created on: Mar 25, 2024
- *      Author: ubuntu
+ *      Author: Germán Arranz y Gonzalo Castillo
  */
 
 #ifndef COLOR_H_

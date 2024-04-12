@@ -2,24 +2,38 @@
  * color.c
  *
  *  Created on: Mar 25, 2024
- *      Author: ubuntu
+ *      Author: Germán Arranz y Gonzalo Castillo
  */
 
 #include "color.h"
 
-int fd_color = 0;
+//File descriptor
+int fd_color;
+
+/*
+ * @function color
+ * @abstarct Obtains the mesurements from the color sensor
+ *
+ * @param A void pointer to an array of parameters (number of arguments and the arguments thmeselves)
+ *
+ * @result None
+ *
+ * */
 
 void* color(void* arg){
 
+	//Importing arguments from the command line
     char **arguments = (char **)arg;
     char **argv = (char **)arguments[1];
 
+    //Powering and configurating the accelerometer
     pthread_mutex_lock(&lock);
 	init_I2C_color();
 	power_color(1);
 	conf_rgbc(atoi(argv[4]), atoi(argv[5]));
 	pthread_mutex_unlock(&lock);
 
+	//Mesurements
 	while(term_color && bucle){
 		pthread_mutex_lock(&lock);
 		readRGBC();
@@ -32,63 +46,93 @@ void* color(void* arg){
 
 }
 
-void init_I2C_color(){
-	char i2cFile[15]; //Donde se almacenara el nombre del dispositivo
-	int device = 1;   //En caso de que tengamos mas de un dispositivo controlado por i2c
-	int addr = 0x29;  //La direccion del MPU6050 por defecto
-
-	/*
-	Ponemos la direccion del dispositivo en el array de caracteres (es C) y abrimos un descriptor mediante la fucnion open(),
-	esta nos devuelve un int que nos servira para referenciarlo durante todo el programa.
-	*/
-
-	sprintf(i2cFile, "/dev/i2c-%d", device);
-	fd_color = open(i2cFile, O_RDWR);   //Se puede escribir y leer
-
-	ioctl(fd_color, I2C_SLAVE, addr);   //Le pasamos la direccion del esclavo, y le decimos que actue como tal
-}
+/*
+ * @function power_color
+ * @abstarct Turns on/off the color sensor
+ *
+ * @param An integer signaling on/off
+ *
+ * @result None
+ *
+ * */
 
 void power_color(int on){
 	char write_bytes [2];
 	write_bytes[0] = COMMAND;
 	write_bytes[1] = on;
 
-	write(fd_color, write_bytes, 2);	//Escribimos en el registro de POWER
+	write(fd_color, write_bytes, 2);
 }
+
+/*
+ * @function init_I2C_acc
+ * @abstarct Starts the I2C communication with the color sensor
+ *
+ * @param None
+ *
+ * @result None
+ *
+ * */
+
+void init_I2C_color(){
+	char i2cFile[15];
+	int device = 1;
+	int addr = 0x29;
+
+	sprintf(i2cFile, "/dev/i2c-%d", device);
+	fd_color = open(i2cFile, O_RDWR);
+
+	ioctl(fd_color, I2C_SLAVE, addr);
+}
+
+/*
+ * @function readAccel
+ * @abstarct Reads the acceleration data from the accelerometer and translates it to a decimal number
+ *
+ * @param None
+ *
+ * @result None
+ *
+ * */
 
 
 void readRGBC(){
-	char read_bytes[MAX_READ];  	//Buffer donde almacenaremos los bits de lectura
-	char write_bytes[MAX_WRITE];  	//Buffer para los bits de escritura.
+	char read_bytes[MAX_READ];
+	char write_bytes[MAX_WRITE];
 
-	//Empezamos la medida
 	write_bytes[0] = COMMAND | ENABLE_REG;
 	write_bytes[1] = 0x03;
 	write(fd_color, write_bytes, 2);
 
-	//Esperamoos 700ms
-	usleep(700000);
-
-	//Ponemos el puntero en el primer registro
 	write_bytes[0] = COMMAND | CLEAR_REG;
 	write(fd_color, write_bytes, 1);
 
 	read(fd_color, read_bytes, 8);
 
-	color_data.clearence= (read_bytes[1] << 8) | read_bytes[0]; //Concatenar
-	int16_t red_raw = (read_bytes[3] << 8) | read_bytes[2];   //Concatenar
-	int16_t green_raw = (read_bytes[5] << 8) | read_bytes[4]; //Concatenar
-	int16_t blue_raw = (read_bytes[7] << 8) | read_bytes[6];  //Concatenar
+	color_data.clearence= (read_bytes[1] << 8) | read_bytes[0];
+	int16_t red_raw = (read_bytes[3] << 8) | read_bytes[2];
+	int16_t green_raw = (read_bytes[5] << 8) | read_bytes[4];
+	int16_t blue_raw = (read_bytes[7] << 8) | read_bytes[6];
 
-	color_data.red = (int) (((float)red_raw / color_data.clearence)*255); //Sensibilidad pasada como parametro
-	color_data.green = (int) (((float)green_raw / color_data.clearence)*255); //Sensibilidad pasada como parametro
-	color_data.blue = (int) (((float)blue_raw / color_data.clearence)*255); //Sensibilidad pasada como parametro
+	color_data.red = (int) (((float)red_raw / color_data.clearence)*255);
+	color_data.green = (int) (((float)green_raw / color_data.clearence)*255);
+	color_data.blue = (int) (((float)blue_raw / color_data.clearence)*255);
 }
 
-void conf_rgbc(int rgbc_cycles, int rgbc_gain){
-	char write_bytes[MAX_WRITE];  	//Buffer para los bits de escritura.
 
-	//Configuramos los ciclos de integracion
+/*
+ * @function conf_rgbc
+ * @abstarct Configures the integration cycles and the gain of the accelerometer
+ *
+ * @param rgbc_cycles, rgbc_gain
+ *
+ * @result None
+ *
+ * */
+
+void conf_rgbc(int rgbc_cycles, int rgbc_gain){
+	char write_bytes[MAX_WRITE];
+
 	write_bytes[0] = COMMAND | TIMING_REG;
 	write_bytes[1] = 0x00;
 	switch(rgbc_cycles){
@@ -106,7 +150,6 @@ void conf_rgbc(int rgbc_cycles, int rgbc_gain){
 	}
 	write(fd_color, write_bytes, 2);
 
-	//Configuramos la ganancia
 	write_bytes[0] = COMMAND | GAIN_REG;
 	write_bytes[1] = 0x00;
 	switch(rgbc_gain){

@@ -2,7 +2,7 @@
  * main.h
  *
  *  Created on: Mar 25, 2024
- *      Author: ubuntu
+ *      Author: Germán Arranz y Gonzalo Castillo
  */
 
 #ifndef MAIN_H_

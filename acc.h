@@ -2,7 +2,7 @@
  * acc.h
  *
  *  Created on: Mar 25, 2024
- *      Author: ubuntu
+ *      Author: Germán Arranz y Gonzalo Castillo
  */
 
 #ifndef ACC_H_
