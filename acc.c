@@ -9,6 +9,7 @@
 
 //File Descriptor
 int fd_acc;
+extern t_data data;
 
 /*
  * @function acc
@@ -38,7 +39,7 @@ void* acc(void* arg) {
     while (term_acc && bucle) {
         pthread_mutex_lock(&lock);
         readAccel(BASE_ACCEL_SCALE / (float)atoi(argv[2]));
-        acc_data.temp = readTemp();
+        data.acc_data.temp = readTemp();
         readGyro(BASE_GYRO_SCALE / (float)atoi(argv[3]));
         pthread_mutex_unlock(&lock);
         usleep(atoi(argv[1]) * 1000);
@@ -108,9 +109,9 @@ void readAccel(float accel_scale){
 	int16_t y_accel = (read_bytes[2] << 8) | read_bytes[3];
 	int16_t z_accel = (read_bytes[4] << 8) | read_bytes[5];
 
-	acc_data.acc_x = x_accel / accel_scale;
-	acc_data.acc_y = y_accel / accel_scale;
-	acc_data.acc_z = z_accel / accel_scale;
+	data.acc_data.acc_x = x_accel / accel_scale;
+	data.acc_data.acc_y = y_accel / accel_scale;
+	data.acc_data.acc_z = z_accel / accel_scale;
 }
 
 /*
@@ -160,9 +161,9 @@ void readGyro(float gyro_scale){
 	int16_t y_gyro = (read_bytes[2] << 8) | read_bytes[3];
 	int16_t z_gyro = (read_bytes[4] << 8) | read_bytes[5];
 
-	acc_data.gyro_x = x_gyro / gyro_scale;
-	acc_data.gyro_y = y_gyro / gyro_scale;
-	acc_data.gyro_z = z_gyro / gyro_scale;
+	data.acc_data.gyro_x = x_gyro / gyro_scale;
+	data.acc_data.gyro_y = y_gyro / gyro_scale;
+	data.acc_data.gyro_z = z_gyro / gyro_scale;
 }
 
 /*

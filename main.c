@@ -12,8 +12,14 @@
 int bucle = 1;
 int term_acc, term_color;
 
+
+/*
 data_acc acc_data;
 data_color color_data;
+*/
+
+t_data data = {0};
+
 pthread_t th_acc, th_color;
 
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
@@ -21,6 +27,19 @@ pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 void close_all(int signal);
 
 int main(int argc, char *argv[]) {
+
+	int sockfd;
+	struct sockaddr_in serv_addr;
+
+	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+	memset(&serv_addr, 0, sizeof(serv_addr));
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(4096);
+	serv_addr.sin_addr.s_addr = inet_addr("192.168.182.231");
+
+	connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+
 	uso(argv, argc);
 
     signal(SIGINT, close_all);
@@ -35,15 +54,21 @@ int main(int argc, char *argv[]) {
 
     while (bucle) {
 
+    	data.acc_sens = 0;
+    	data.gyro_sens = 0;
+
     	signal(SIGINT, close_all);
     	system("clear");
         printf("=========== Datos de la Aplicación ===========\n");
-        printf("   Aceleración (x, y, z): %.2f g, %.2f g, %.2f g SENSIBILIDAD: %d g\n", acc_data.acc_x, acc_data.acc_y, acc_data.acc_z, atoi(argv[2]));
-        printf("   Giroscopio (x, y, z): %.2fº, %.2fº, %.2fº     SENSIBILIDAD: %d º\n", acc_data.gyro_x, acc_data.gyro_y, acc_data.gyro_z, atoi(argv[3]));
-        printf("   Temperatura: %.2f ºC\n", acc_data.temp);
-        printf("   Color RGB: (%d R, %d G, %d B)\n", color_data.red, color_data.green, color_data.blue);
+        printf("   Aceleración (x, y, z): %.2f g, %.2f g, %.2f g SENSIBILIDAD: %d g\n", data.acc_data.acc_x, data.acc_data.acc_y, data.acc_data.acc_z, atoi(argv[2]));
+        printf("   Giroscopio (x, y, z): %.2fº, %.2fº, %.2fº     SENSIBILIDAD: %d º\n", data.acc_data.gyro_x, data.acc_data.gyro_y, data.acc_data.gyro_z, atoi(argv[3]));
+        printf("   Temperatura: %.2f ºC\n", data.acc_data.temp);
+        printf("   Color RGB: (%d R, %d G, %d B)\n", data.color_data.red, data.color_data.green, data.color_data.blue);
         printf("==============================================\n");
         fflush(stdout);
+
+        sendto(sockfd, (struct t_data*)&data, (1024+sizeof(data)), 0, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+
         sleep(1);
 
     }
@@ -114,6 +139,3 @@ void uso(char *argv[], int argc){
 		}
 
 }
-
-
-

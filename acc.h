@@ -23,10 +23,6 @@
 #define GYRO_CONF_REG 0x1B
 
 
-typedef struct{
-	float acc_x, acc_y, acc_z, gyro_x, gyro_y, gyro_z, temp;
-}data_acc;
-
 int esPotencia2 (int num);
 void power_acc(int on);
 void init_I2C_acc();
@@ -37,7 +33,7 @@ void conf_accel(int accel_range);
 void conf_gyro(int gyro_range);
 void *acc (void *arg);
 
-extern data_acc acc_data;
+
 extern int term_acc;
 
 

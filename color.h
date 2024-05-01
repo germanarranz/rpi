@@ -31,14 +31,9 @@ void readRGBC();
 void conf_rgbc(int rgbc_cycles, int rgbc_gain);
 void* color(void* arg);
 
-typedef struct{
-	int red, green, blue, clearence;
-}data_color;
 
 extern int term_color;
-extern data_color color_data;
-
-
+//extern t_data data;
 
 
 #endif /* COLOR_H_ */

@@ -9,6 +9,7 @@
 
 //File descriptor
 int fd_color;
+extern t_data data;
 
 /*
  * @function color
@@ -109,14 +110,14 @@ void readRGBC(){
 
 	read(fd_color, read_bytes, 8);
 
-	color_data.clearence= (read_bytes[1] << 8) | read_bytes[0];
+	data.color_data.clearence= (read_bytes[1] << 8) | read_bytes[0];
 	int16_t red_raw = (read_bytes[3] << 8) | read_bytes[2];
 	int16_t green_raw = (read_bytes[5] << 8) | read_bytes[4];
 	int16_t blue_raw = (read_bytes[7] << 8) | read_bytes[6];
 
-	color_data.red = (int) (((float)red_raw / color_data.clearence)*255);
-	color_data.green = (int) (((float)green_raw / color_data.clearence)*255);
-	color_data.blue = (int) (((float)blue_raw / color_data.clearence)*255);
+	data.color_data.red = (int) (((float)red_raw / data.color_data.clearence)*255);
+	data.color_data.green = (int) (((float)green_raw / data.color_data.clearence)*255);
+	data.color_data.blue = (int) (((float)blue_raw / data.color_data.clearence)*255);
 }
 
 
