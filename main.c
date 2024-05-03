@@ -12,13 +12,9 @@
 int bucle = 1;
 int term_acc, term_color;
 
+t_data data;
 
-/*
-data_acc acc_data;
-data_color color_data;
-*/
-
-t_data data = {0};
+t_data data_send[10];
 
 pthread_t th_acc, th_color;
 
@@ -35,10 +31,9 @@ int main(int argc, char *argv[]) {
 
 	memset(&serv_addr, 0, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(4096);
-	serv_addr.sin_addr.s_addr = inet_addr("192.168.182.231");
+	serv_addr.sin_port = htons(atoi(argv[5]));
+	serv_addr.sin_addr.s_addr = inet_addr(argv[6]);
 
-	connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
 	uso(argv, argc);
 
@@ -51,11 +46,13 @@ int main(int argc, char *argv[]) {
 
     pthread_create(&th_color, NULL, color, arguments);
     pthread_create(&th_acc, NULL, acc, arguments);
+    atoi(argv[1]);
+    int cnt = 0;
 
     while (bucle) {
 
-    	data.acc_sens = 0;
-    	data.gyro_sens = 0;
+    	data.acc_sens = atoi(argv[1]);
+    	data.gyro_sens = atoi(argv[2]);
 
     	signal(SIGINT, close_all);
     	system("clear");
@@ -67,7 +64,18 @@ int main(int argc, char *argv[]) {
         printf("==============================================\n");
         fflush(stdout);
 
-        sendto(sockfd, (struct t_data*)&data, (1024+sizeof(data)), 0, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+        memcpy(&data_send[cnt], &data, sizeof(t_data));
+        cnt++;
+
+        if(cnt == 10){
+        	 sendto(sockfd, data_send, (sizeof(data_send)), 0, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+        	 cnt = 0;
+        	 char ack[30];
+        	 recvfrom(sockfd, ack, sizeof(ack), 0, NULL, NULL);
+        	 printf("%s\n", ack);
+
+        }
+
 
         sleep(1);
 
@@ -112,26 +120,23 @@ void uso(char *argv[], int argc){
 			fprintf(stderr,"Por ejemplo escriba en la ventana de comandos: ./sensores 1000 2 250 1 1  como ejemplo de medidas cada segundo con fondo de escala de +-2g y 250 º/s, ciclos de integración 1 y ganancia 1\n\n");
 			exit(0);
 		}
-		if(atoi(argv[1]) <= 0){
-			fprintf(stderr, "Introduzca un periodo de muestreo mayor que 0\n ");
-			exit(0);
-		}else{
-			int rangoAcc = atoi(argv[2]);
+	else{
+			int rangoAcc = atoi(argv[1]);
 			if(rangoAcc<=0 || rangoAcc >16) {
 				fprintf(stderr, "El rango del acelerometro debe tener un valor de 2, 4, 8 o 16 g\n");
 				exit(0);
 			}
-			int rangoGyro = atoi(argv[3]);
+			int rangoGyro = atoi(argv[2]);
 			if(rangoGyro != 250 && rangoGyro != 500 && rangoGyro != 1000 && rangoGyro != 2000){
 				fprintf(stderr, "El rango del giroscopio debe tener un valor de 250, 500, 1000 o 2000 º/s\n");
 				exit(0);
 			}
-			int rgcb_cycles = atoi(argv[4]);
+			int rgcb_cycles = atoi(argv[3]);
 			if(rgcb_cycles != 1 && rgcb_cycles != 10 && rgcb_cycles != 42 && rgcb_cycles != 64 && rgcb_cycles != 256){
 				fprintf(stderr, "Los ciclos de integracion han de tener un valor de 1, 10, 42, 64, 256\n");
 				exit(0);
 			}
-			int rgbc_gain = atoi(argv[5]);
+			int rgbc_gain = atoi(argv[4]);
 			if(rgbc_gain != 1 && rgbc_gain != 4 && rgbc_gain != 16 && rgbc_gain != 60){
 				fprintf(stderr, "La ganancia ha de tener un valor de 1, 4, 16, 60\n");
 				exit(0);

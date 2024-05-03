@@ -25,12 +25,12 @@ typedef struct{
 	float acc_x, acc_y, acc_z, gyro_x, gyro_y, gyro_z, temp;
 }data_acc;
 
-struct t_data{
+typedef struct{
 	data_acc acc_data;
 	data_color color_data;
 	int acc_sens;
 	int gyro_sens;
-};
+}t_data;
 
 
 #endif /* SERVER_H_ */

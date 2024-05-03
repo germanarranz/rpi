@@ -31,7 +31,7 @@ void* color(void* arg){
     pthread_mutex_lock(&lock);
 	init_I2C_color();
 	power_color(1);
-	conf_rgbc(atoi(argv[4]), atoi(argv[5]));
+	conf_rgbc(atoi(argv[3]), atoi(argv[4]));
 	pthread_mutex_unlock(&lock);
 
 	//Mesurements
@@ -39,7 +39,7 @@ void* color(void* arg){
 		pthread_mutex_lock(&lock);
 		readRGBC();
 		pthread_mutex_unlock(&lock);
-		usleep(atoi(argv[1]) * 1000);
+		sleep(0.1);
 	}
 	close(fd_color);
 	pthread_exit(NULL);

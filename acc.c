@@ -31,18 +31,18 @@ void* acc(void* arg) {
     pthread_mutex_lock(&lock);
     init_I2C_acc();
     power_acc(ON);
-    conf_accel(atoi(argv[2]));
-    conf_gyro(atoi(argv[3]));
+    conf_accel(atoi(argv[1]));
+    conf_gyro(atoi(argv[2]));
     pthread_mutex_unlock(&lock);
 
     //Mesurements
     while (term_acc && bucle) {
         pthread_mutex_lock(&lock);
-        readAccel(BASE_ACCEL_SCALE / (float)atoi(argv[2]));
+        readAccel(BASE_ACCEL_SCALE / (float)atoi(argv[1]));
         data.acc_data.temp = readTemp();
-        readGyro(BASE_GYRO_SCALE / (float)atoi(argv[3]));
+        readGyro(BASE_GYRO_SCALE / (float)atoi(argv[2]));
         pthread_mutex_unlock(&lock);
-        usleep(atoi(argv[1]) * 1000);
+        sleep(0.1);
     }
     close(fd_acc);
     pthread_exit(NULL);
