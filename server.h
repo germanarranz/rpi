@@ -16,6 +16,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <math.h>
 
 typedef struct{
 	int red, green, blue, clearence;
@@ -31,6 +32,11 @@ typedef struct{
 	int acc_sens;
 	int gyro_sens;
 }t_data;
+
+t_data media(t_data data_recv[]);
+t_data dev(t_data data_recv[], t_data mean);
+t_data max(t_data data_recv[]);
+t_data min(t_data data_recv[]);
 
 
 #endif /* SERVER_H_ */

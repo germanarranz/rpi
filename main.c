@@ -46,7 +46,6 @@ int main(int argc, char *argv[]) {
 
     pthread_create(&th_color, NULL, color, arguments);
     pthread_create(&th_acc, NULL, acc, arguments);
-    atoi(argv[1]);
     int cnt = 0;
 
     while (bucle) {
